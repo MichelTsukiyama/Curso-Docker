@@ -1,0 +1,7 @@
+C:\Users\miche\Documents\work2022\Docker\projetoMVC\MVC2\dist\MVC2.exe
+C:\Users\miche\Documents\work2022\Docker\projetoMVC\MVC2\dist\appsettings.Development.json
+C:\Users\miche\Documents\work2022\Docker\projetoMVC\MVC2\dist\appsettings.json
+C:\Users\miche\Documents\work2022\Docker\projetoMVC\MVC2\dist\MVC2.dll
+C:\Users\miche\Documents\work2022\Docker\projetoMVC\MVC2\dist\MVC2.deps.json
+C:\Users\miche\Documents\work2022\Docker\projetoMVC\MVC2\dist\MVC2.runtimeconfig.json
+C:\Users\miche\Documents\work2022\Docker\projetoMVC\MVC2\dist\MVC2.pdb

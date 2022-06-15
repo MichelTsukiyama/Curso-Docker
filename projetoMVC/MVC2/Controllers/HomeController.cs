@@ -12,7 +12,7 @@ public class HomeController : Controller
     public HomeController(IRepository repo, IConfiguration config)
     {
         this.repository = repo;
-        message = config["MESSAGE"] ?? "ASPNET Core MVC - Docker";
+        message = $"Docker - ({config["HOSTNAME"]})";
     }
 
     public IActionResult Index()

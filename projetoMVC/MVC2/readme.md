@@ -1,4 +1,4 @@
-## Projeto MVC + MySQL, 2 contêineres + volume
+## 1. Projeto MVC + MySQL, 2 contêineres + volume
 <br>
 
 Neste projeto vamos alterar o projeto MVC1 para se conectar ao MySQL, também será criado um novo contêiner para o MySQL, vamos mapear um volume para armazenar os dados e conectar os 2 contêineres.
@@ -13,12 +13,26 @@ Este projeto é sequência do [MVC1](../MVC1/readme.md), você pode consultar a 
 
 ----
 
-## Sumário
+## 2. Sumário
 <br>
 
+- [1. Projeto MVC + MySQL, 2 contêineres + volume](#1-projeto-mvc--mysql-2-contêineres--volume)
+- [2. Sumário](#2-sumário)
+- [- 13. Criar contêiner com a imagem mvc2 e conectar ao contêiner mysqlMVC2](#--13-criar-contêiner-com-a-imagem-mvc2-e-conectar-ao-contêiner-mysqlmvc2)
+- [3. Incluir os pacotes para MySQL e EF Core](#3-incluir-os-pacotes-para-mysql-e-ef-core)
+- [4. Criar arquivo de contexto](#4-criar-arquivo-de-contexto)
+- [5. Criar a classe de repositório](#5-criar-a-classe-de-repositório)
+- [6. Criar classe para popular banco de dados](#6-criar-classe-para-popular-banco-de-dados)
+- [7. Configurar appsettings.json](#7-configurar-appsettingsjson)
+- [8. Configurando a Classe Startup.cs (.Net 5.0)](#8-configurando-a-classe-startupcs-net-50)
+- [9. Configurando a classe Program.cs (.Net 6.0)](#9-configurando-a-classe-programcs-net-60)
+- [10. Criar script de migração](#10-criar-script-de-migração)
+- [11. Criar o Contêiner com MySQL](#11-criar-o-contêiner-com-mysql)
+- [12. Criar imagem do MVC2](#12-criar-imagem-do-mvc2)
+- [13. Criar contêiner com a imagem mvc2 e conectar ao contêiner mysqlMVC2](#13-criar-contêiner-com-a-imagem-mvc2-e-conectar-ao-contêiner-mysqlmvc2)
 ----
 
-## Incluir os pacotes para MySQL e EF Core
+## 3. Incluir os pacotes para MySQL e EF Core
 <br>
 
 Os pacotes abaixo devem ser incluídos no projeto MVC, lembre-se de usar os comando sempre no diretório de seu projeto. No caso deste projeto, projetoMVC > MVC2
@@ -59,7 +73,7 @@ Após adicionar os pacotes, verifique se eles aparecem no MVC2.csproj, conforme 
 
 ----
 
-## Criar arquivo de contexto
+## 4. Criar arquivo de contexto
 <br>
 
 No diretorio projetoMVC > MVC2, vamos criar a pasta Data e nela criar a classe AppDbContext.cs, com o seguinte conteúdo:
@@ -87,7 +101,7 @@ public class AppDbContext : DbContext //herda de DbContext
   
 ---
 
-## Criar a classe de repositório
+## 5. Criar a classe de repositório
 <br>
 
 Essa classe vai substituir a classe TesteRepository.cs, acessar os dados na tabela **Produtos** mapeada na classe de contexto **AppDbContext.cs** .
@@ -114,7 +128,7 @@ public class ProdutoRepository : IRepository //implementa a interface IRepositor
 
 ---
 
-## Criar classe para popular banco de dados
+## 6. Criar classe para popular banco de dados
 <br>
 
 Essa classe vai inserir alguns dados iniciais no Banco de Dados, na tabela Produtos.
@@ -174,7 +188,7 @@ public static class PopulaDb
     }
 ```
 -----
-## Configurar appsettings.json
+## 7. Configurar appsettings.json
 <br>
 
 No arquivo appsettings.json , adicionar as seguintes linhas:
@@ -197,7 +211,7 @@ A string de conexão possui as informações para conectar ao MySQL, você talve
 
 ----
 
-## Configurando a Classe Startup.cs (.Net 5.0)
+## 8. Configurando a Classe Startup.cs (.Net 5.0)
 <br>
 
 1. Na classe Startup, ConfigureServices() substitua o TesteRepository por ProdutoRepository;
@@ -248,7 +262,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 ```
 ----
 
-## Configurando a classe Program.cs (.Net 6.0)
+## 9. Configurando a classe Program.cs (.Net 6.0)
 <br>
 
 1. Na classe Program.cs, substituir TesteRepository por ProdutoRepository;
@@ -290,7 +304,7 @@ PopulaDb.CreateDBIfNotExists(app); //inserir essa linha
 
 ---
 
-## Criar script de migração
+## 10. Criar script de migração
 <br>
 
 Vamos usar o comando abaixo para gerar o script que cria o Banco de Dados e a tabela Produtos da aplicação. Pode colocar o nome da migração como "Inicial".
@@ -308,7 +322,7 @@ Se tudo ocorrer bem, aparecerá no terminal a mensagem "Done. To undo this actio
 </center>
 
 ----
-## Criar o Contêiner com MySQL
+## 11. Criar o Contêiner com MySQL
 <br>
 
 1. Baixar a imagem do MySQL 8.0:
@@ -351,7 +365,7 @@ Se tudo ocorrer bem, aparecerá no terminal a mensagem "Done. To undo this actio
 
 ----
 
-## Criar imagem do MVC2
+## 12. Criar imagem do MVC2
 <br>
 
 >**Obs.:** Vá até o arquivo appsettings.json, e na string de conexão "DefaultConnection" substitua o server=localhost por server=172.17.0.2 .Faça isso antes do dotnet publish.
@@ -372,7 +386,7 @@ Se tudo ocorrer bem, aparecerá no terminal a mensagem "Done. To undo this actio
 
 ----
 
-## Criar contêiner com a imagem mvc2 e conectar ao contêiner mysqlMVC2
+## 13. Criar contêiner com a imagem mvc2 e conectar ao contêiner mysqlMVC2
 <br>
 
 Os contêineres serão conectados por uma *Rede Definida por Software*(SDN) ou rede virtual.

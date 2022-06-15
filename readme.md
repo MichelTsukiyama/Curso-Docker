@@ -7,7 +7,7 @@
 
 - [1. Docker](#1-docker)
 - [2. Sumário](#2-sumário)
-- [- 7. Docker Compose](#--7-docker-compose)
+- [- Otimizar o Dockerfile](#--otimizar-o-dockerfile)
 - [3. Completar.](#3-completar)
 - [4. Imagens](#4-imagens)
   - [4.1. Como criar imagens?](#41-como-criar-imagens)
@@ -25,6 +25,8 @@
   - [6.3. Limitações da Rede Padrão (bridge)](#63-limitações-da-rede-padrão-bridge)
   - [6.4. Balanceador de Carga](#64-balanceador-de-carga)
 - [7. Docker Compose](#7-docker-compose)
+- [Deploy no Contêiner](#deploy-no-contêiner)
+- [Otimizar o Dockerfile](#otimizar-o-dockerfile)
 ----
 ## 3. Completar.
 <br>
@@ -128,7 +130,7 @@ Esse processo é conhecido como **build**.
 
 2 - Neste arquivo digite o seguinte conteúdo:
 
-```docker
+```Dockerfile
 FROM debian:8 #definir imagem base
 LABEL VERSION="1.0" description="Debian/Nginx" #informações para a imagem
 RUN apt-get update && apt-get install -y nginx && apt-get clean #atualizar, instalar (flag -y para confirmar) e limpar os pacotes;
@@ -486,7 +488,7 @@ Digite hostname -i, no modo iterativo (-it abre um terminal), para ver o IP do c
 
 O balanceador de carga tem a tarefa de dividir o tráfego para diferentes servidores evitando a sobrecarga, quando há muitos acessos.
 
-Aqui vamos criar as redes frontend e backend, com 2 contêineres MVC, 1 contêiner MySQL e usar o [haproxy](https://hub.docker.com/_/haproxy) para fazer o balanceamento de carga. 
+Aqui vamos criar as redes frontend e backend, com 3 contêineres MVC, 1 contêiner MySQL e usar o [haproxy](https://hub.docker.com/_/haproxy) para fazer o balanceamento de carga. 
 
 **Importante** - aqui é necessário usar a variável host, passando o DBPORT conforme feito no projeto MVC2, na classe Program.cs, na imagem MVC. Neste exemplo eu criei as imagens do mvc3, mvc4 e mvc5.
 
@@ -519,7 +521,7 @@ string ConnectionString = $"server={host};port=3306;database=produtosdb;uid=root
 
 4. Cofigurando o haproxy:
 
-  Escolha um diretório e crie um arquivvo chamado "haproxy.cfg", lembre-se de usar esse diretório ao informar o volume quando criar o container do haproxy, pois ele vai passar as informações para a imagem. Este arquivo deve conter o conteúdo abaixo:
+  Escolha um diretório e crie um arquivo chamado "haproxy.cfg", lembre-se de usar esse diretório ao informar o volume quando criar o container do haproxy, pois ele vai passar as informações para a imagem. Este arquivo deve conter o conteúdo abaixo:
 
         defaults
             timeout connect 5000
@@ -556,3 +558,179 @@ string ConnectionString = $"server={host};port=3306;database=produtosdb;uid=root
 ----
 
 ## 7. Docker Compose
+
+O Docker Compose é uma ferramenta usada para descrever aplicações complexas e gerenciar os contêineres, redes e volumes que essas aplicações exigem para funcionar.
+
+Simplifica o processo de configuração e execução de aplicativos para que você não precise digitar comandos complexos, que poderiam levar a erros de configuração.
+
+Faz isso através de um arquivo.yml.
+
+[Instalar o docker Compose (Linux)](https://docs.docker.com/compose/install/). Se tiver instalado o Docker for Windows ele já vem com o Compose junto.
+
+Este arquivo, é chamado de docker-compose.yml, e é divido em seções:
+
+Seção| Descrição
+---    | ---
+version| Especifica a versão do esquema **Docker compose88 que o arquivo usa.
+volumes| Usado para confiigurar Volumes que serão usados pelos contêiineres definidos para compor arquivo.
+networks| Usado para configurar as redes que serão usadoas pelos contêineres.
+services| Define os contêineres que serão utilizados (imagens, contextos...)
+
+
+1. Crie um arquivo chamado docker-compose.yml;
+2. Insira o código abaixo nele:
+
+```docker-compose
+version: "3"
+
+volumes:
+      produtosmvc:
+
+networks:
+      frontend:
+      backend:
+
+services:
+
+      mysql:
+        image: "mysql:8.0"
+        volumes:
+          - produtosmvc:/var/lib/mysql
+        networks:
+          - backend
+        enviroment:
+          - MYSQL_ROOT_PASSWORD=root
+          -bind-address=0.0.0.0
+
+      mvc:
+        build:
+          context: ./projetoMVC/MVC2 .
+          dockerfile: Dockerfile
+        networks:
+          - backend
+          - frontend
+        ports:
+          - 5000:80
+        environment:
+          - DBHOST=mysql
+        depends_on:
+          - mysql
+```
+**Atenção!** alguns diretórios podem ser diferentes, dependendo de onde você criou os arquivos.
+
+3. Processar aquivo de composição e verificar a sintaxe:
+
+        docker-compose build
+
+4. Processar arquivo de composição e iniciar aplicação(`-d` para rodar em 2 plano, deixando o terminal livre):
+
+        docker-compose up -d
+
+5. Aguarde um pouco, e verifique os logs para ver se já é possível se conectar ao container MySQL e se o MVC está funcionando corretamente:
+
+        docker-compose logs
+
+6. Verifique se a tabela foi criada corretamente:
+
+        docker container exec -it <nome_do_container_mysql> bash
+        mysql -u root -p
+        senha: root
+        show databases;
+        use produtosdb;
+        show tables;
+        select * from Produtos;
+
+7. Acesse a aplicação no link http://localhost:5000/ para ver se tudo está funcionando.
+
+8. Desfazer operação(se usar a flag -v exclui os volumes também):
+
+        docker-compose down
+
+----
+
+## Deploy no Contêiner
+<br>
+
+Fazer o Deploy no contêiner nada mais é, que publicar a aplicação usando o próprio docker. Você não vai fazer manualmente o `dotnet publish`.
+
+O primeiro passo é escolher a imagem base e seguir a sequência conforme imagem abaixo:
+
+<center>
+
+![deploy](src/deploy.png)
+
+</center>
+
+1. Criar o arquivo Dockerfile.dev, para distinguir do primeiro Dockerfile, com o seguinte conteúdo:
+
+```Dockerfile
+FROM mcr.microsoft.com/dotnet/sdk:6.0
+
+RUN mkdir /app
+WORKDIR /app
+COPY MVC2.csproj .
+
+RUN dotnet restore
+COPY . .
+
+RUN dotnet publish -c Release -o dist
+
+EXPOSE 80/tcp
+
+CMD ["dotnet","dist/MVC2.dll"]
+```
+
+2. Criar o arquivo docker-compose-dev.yml, alterando o dockerfile para Dockerfile.dev
+
+```Dockerfile
+dockerfile: Dockerfile.dev //alterar esta linha
+```
+
+3. Utilizar o comando `docker-compose -f <nome__do_arq_docker_compose> -p` (-f para indicar o arquivo, e -p para criar um prefixo no nome)
+
+        docker-compose -f docker-compose-dev.yml -p dev up mvc
+
+Obs.: 'mvc' faz referência ao container a ser levantado no docker-compose file.
+
+
+----
+
+## Otimizar o Dockerfile
+<br>
+
+- Suporte a multi-estágios (usar + de um comando FROM);
+- Cada comando FROM é um novo estágio que substitui o anterior/ como se fosse uma nova imagem independente e isolada;
+- Você pode nomear os estágios usando AS;
+- O comando COPY --from, pode ser usado para copiar arquivos de um estágio, ou etapas anteriores.
+
+1. Otimizando o Dockerfile.dev
+
+```dockerfile
+#Estagio1 - base
+
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+RUN mkdir /app
+WORKDIR /app
+EXPOSE 80/tcp
+
+#Estagio2 - publish
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS publish
+WORKDIR /app
+COPY MVC2.csproj .
+RUN dotnet restore
+COPY . .
+RUN dotnet publish -c Release -o dist
+
+#Estagio3 - final
+
+FROM base AS final
+WORKDIR /dist
+COPY --from=publish /app/dist .
+ENTRYPOINT [ "dotnet","MVC2.dll" ]
+```
+
+Veja que a imagem gerada é bem menor que usar apenas a imagem do aspnet:6.0;
+
+
+

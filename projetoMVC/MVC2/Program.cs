@@ -7,7 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-string ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var host = builder.Configuration["DBHOST"] ?? "localhost";
+string ConnectionString = $"server={host};port=3306;database=produtosdb;uid=root;password=root";
 
 builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseMySql(ConnectionString, ServerVersion.AutoDetect(ConnectionString)));
@@ -27,7 +28,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-PopulaDb.CreateDBIfNotExists(app);
+//PopulaDb.CreateDBIfNotExists(app);
 
 app.UseRouting();
 

@@ -27,6 +27,7 @@ O objetivo do Docker é criar, testar e implementar aplicações em um ambiente 
 - [7. Docker Compose](#7-docker-compose)
 - [8. Deploy no Contêiner](#8-deploy-no-contêiner)
 - [9. Otimizar o Dockerfile](#9-otimizar-o-dockerfile)
+- [10. Usando Extensão para criar o Dockerfile](#10-usando-extensão-para-criar-o-dockerfile)
   
 ----
 
@@ -99,8 +100,8 @@ O objetivo do Docker é criar, testar e implementar aplicações em um ambiente 
             docker build -t <imagem> //exemplo do comando
         
   2. Usando o comando commit (**não aderente as boas práticas, não deixa registro de como a imagem foi gerada**)
-   <br>
-   <br>
+   
+<br>
 
 ---
 
@@ -738,5 +739,20 @@ ENTRYPOINT [ "dotnet","MVC2.dll" ]
 
 Veja que a imagem gerada é bem menor que usar apenas a imagem do aspnet:6.0;
 
+----
+
+## 10. Usando Extensão para criar o Dockerfile
+
+A extensão ***Docker* da Microsoft** permite criar automáticamente os arquivos Dockerfile e docker-compose.yml em seus projetos no VS Code, facilitando o desenvolvimento.
+
+Para isso basta apertar F1 no VS Code e digitar Docker add, conforme imagem abaixo:
+
+<center>
+
+![extensão-docker](src/extensao.png)
+
+</center>
+
+Para instalar a extensão, basta pesquisar por docker em extensões e encontrar a que é distribuída pela Microsoft.
 
 

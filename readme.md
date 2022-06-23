@@ -1,14 +1,14 @@
 ## 1. Docker
 <br>
-...
+
+O objetivo do Docker é criar, testar e implementar aplicações em um ambiente separado da máquina original, chamado de contêiner, onde o desenvolvedor consegue empacotar sua aplicação de forma padrão com níveis de isolamento.
 
 ----
 ## 2. Sumário
 
 - [1. Docker](#1-docker)
 - [2. Sumário](#2-sumário)
-- [- Otimizar o Dockerfile](#--otimizar-o-dockerfile)
-- [3. Completar.](#3-completar)
+- [3. Contêiners](#3-contêiners)
 - [4. Imagens](#4-imagens)
   - [4.1. Como criar imagens?](#41-como-criar-imagens)
     - [4.1.1. Criando Imagens Docker](#411-criando-imagens-docker)
@@ -25,11 +25,16 @@
   - [6.3. Limitações da Rede Padrão (bridge)](#63-limitações-da-rede-padrão-bridge)
   - [6.4. Balanceador de Carga](#64-balanceador-de-carga)
 - [7. Docker Compose](#7-docker-compose)
-- [Deploy no Contêiner](#deploy-no-contêiner)
-- [Otimizar o Dockerfile](#otimizar-o-dockerfile)
+- [8. Deploy no Contêiner](#8-deploy-no-contêiner)
+- [9. Otimizar o Dockerfile](#9-otimizar-o-dockerfile)
+  
 ----
-## 3. Completar.
+
+## 3. Contêiners
 <br>
+
+
+
 ...
 
 ----
@@ -38,6 +43,7 @@
 <br>
 
 - Os contêineres do Docker são baseados em **imagens do Docker**;
+- **Imagens** são modelos, usados para criar contêineres e que contêm um sistema com todos os arquivos que a aplicação no contêiner requer;
 - **Um contêiner sempre começa com uma imagem** e é considerado uma instanciação dessa imagem;
 - A imagem seria **a classe** e o contêiner **os objetos da classe**;
 - Toda Imagem é composta de uma ou mais camadas **somente leitura**, em um sistema chamado de **"Lyered File System"**;
@@ -648,7 +654,7 @@ services:
 
 ----
 
-## Deploy no Contêiner
+## 8. Deploy no Contêiner
 <br>
 
 Fazer o Deploy no contêiner nada mais é, que publicar a aplicação usando o próprio docker. Você não vai fazer manualmente o `dotnet publish`.
@@ -695,7 +701,7 @@ Obs.: 'mvc' faz referência ao container a ser levantado no docker-compose file.
 
 ----
 
-## Otimizar o Dockerfile
+## 9. Otimizar o Dockerfile
 <br>
 
 - Suporte a multi-estágios (usar + de um comando FROM);
